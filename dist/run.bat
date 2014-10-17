@@ -1,0 +1,1 @@
+java -jar CompareDB-1.0-SNAPSHOT.jar -d
