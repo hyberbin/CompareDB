@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taglib version="2.1" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd">
+    <tlib-version>1.0</tlib-version>
+    <short-name>h</short-name>
+    <uri>http://www.hyberbin.com/tld</uri>
+    <tag>
+        <description>
+            Traverses the the output easydata type of data collection which, 
+            in the middle allows the insertion of JSP content
+        </description>
+        <name>forEach</name>
+        <tag-class>org.jplus.hyb.taglib.ForEachTaglib</tag-class>
+        <body-content>JSP</body-content>
+        <attribute>
+            <description>
+                As traverse the output of the data collection of the types of data sources,
+                the property is required properties, and should be provided by the EL expressions.
+                For example:items="${userList}"
+            </description>
+            <name>items</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <description>
+                Temporary storage when the traversal data object name, 
+                the program will be the i-th data is stored to the pageContext scope.
+                Should be noted that the properties required.
+            </description>
+            <name>var</name>
+            <required>true</required>
+        </attribute>
+        <attribute>
+            <description>
+                Used to record traversal storage subscript value when the variable name, 
+                and facilitate the user to know the location of the traverse, 
+                users can directly use EL expressions to the output variables are stored in the pageContext scope.
+                This property is optional.
+            </description>
+            <name>index</name>
+            <required>false</required>
+        </attribute>
+    </tag>
+    <tag>
+        <description>
+            The tag can be used with the forEach tag, can also be used alone.It should be noted is that the tag has a data attribute,
+            this attribute is optional, but when the user specifies the property, the program will output the value of the data property.
+        </description>
+        <name>out</name>
+        <tag-class>org.jplus.hyb.taglib.OutTaglib</tag-class>
+        <body-content>empty</body-content>
+        <attribute>
+            <description>
+                The property for sex to fill the property, when the output if you do not know the column names, 
+                then fill out the subscript; If you know the column names, you can fill out the column names.
+                It should be noted that, fill in 0, 1, ..., then I will automatically be recognized as a number and press the standard output.
+            </description>
+            <name>column</name>
+            <required>true</required>
+        </attribute>
+        <attribute>
+            <description>
+                This attribute is used to receive data output the single easydata object is an optional parameter. 
+                If this parameter is filled in then the properties of the output priority.
+            </description>
+            <name>edata</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+    </tag>
+    <tag>
+        <description>
+            Used to get the address of the project, such as: http://localhost:8080/myweb
+        </description>
+        <name>path</name>
+        <tag-class>org.jplus.hyb.taglib.BasePathTag</tag-class>
+        <body-content>empty</body-content>
+    </tag>
+</taglib>

@@ -1,0 +1,78 @@
+-------------------Hyberbin规范：-------------------------
+#要使用Hyberbin进行数据库操作必需引入一个properties文件。
+#properties文件参见本文件同级文件夹下的database.properties。
+#HyberbinData和HyberbinServlet可以只选其一使用
+#Hyberbin使用延迟加载后POJO类与JSONObject转化时会出错，我已经修改源码。（请使用JsonUtil-jplus.jar）
+1.数据库中表名和POJO类的名称一致，只允许首字母大写，且必需大写。
+2.数据库中表的字段和POJO类中的字段名称一致，全部小写。
+3.POJO类中的成员变量类型必需为封装类。
+4.seter和geter方法方法名就是在成员变量名首字母大写后加上set或get。
+5.如果要使用延迟加载，POJO类必需继承org.jplus.basetable.BaseTable.
+6.如果要使用延迟加载，表的主键必需唯一，且有@Primarykey()注解。
+7.如果要使用延迟加载，外键字段要加@EntityColumn(name="id")注解。
+8.如果要使用延迟加载，并且POJO类中没有显示调用getL();，则调用一次getL()后加载。
+9.如果要使用缓存池，POJO类名上必需加上@CacheEntity注解
+10.缓存池默认每个只存100条数据，可以@CacheEntity(max=10000)注解调整
+----------------------------------------------------------
+-------------------HyberbinServlet规范：-------------------------
+1.所有请求一律要带上相对应的mode信息。
+2.所有servlet一定要声明对mode相对应的终静态公有变量。
+3.批量接收参数时表单中字段信息要与POJO类一致。
+4.发送json格式信息应在servlet中调用AjaxSetContentType("json");方法。
+5.重定向用redirect="XXX.jsp",转发用send="XXX.jsp",json不需要。
+-----------------------------------------------------------------
+author:hyberbin
+site:www.hyberbin.com
+email:464863696@qq.com
+verson:3.5.5
+build:720
+date:2012/6/19
+#加入连接池
+build:721
+date:2012/6/24
+#加入延迟加载功能并做一些优化
+verson:3.6.0
+build:722
+date:2012/8/5
+#加入缓存池
+verson:3.6.1
+build:723
+date:2012/8/13
+
+--------------------------------------------------
+#数据库配置文件，请将其放在源包下面的database.properties文件
+#如果要放在其它地方则可以在初始化前调用DatabaseINI.ini(文件路径+文件名);
+#下面设置数据库用户权限
+#用户密码
+user=root
+pass=hyb
+#数据库路径 如果是access请提供绝对路径。如:d:/1.mdb
+#url=jdbc:access:///d:\\hyb.mdb
+url=jdbc:mysql://localhost:3306/hsoj?useUnicode=true&characterEncoding=UTF-8&generateSimpleParameterMetadata=true
+#是否输出sql语句
+#sqlout=true
+sqlout=false
+#数据库类型 mysql access sqlserver oracle
+dbtype=mysql
+#dbtype=access
+#dbtype=sqlserver
+#dbtype=oracle
+#驱动
+#driver=sun.jdbc.odbc.JdbcOdbcDriver
+driver=com.mysql.jdbc.Driver
+#driver=oracle.jdbc.driver.OracleDriver
+#driver=com.microsoft.jdbc.sqlserver.SQLServerDriver
+#driver=com.hxtt.sql.access.AccessDriver
+#使用的日志类 默认使用LocalLogger
+logger=org.jplus.util.LocalLogger
+#是否使用连接池
+poolTrue=false
+#pooltrue=true
+#池中最大连接数 */
+maxconn=80
+#池中最小连接数 */
+minconn=10
+#一个连接使用的最大时间 */
+maxtimeout = 30
+#线程池工厂工作时间间隔 */
+threadsleep = 30
