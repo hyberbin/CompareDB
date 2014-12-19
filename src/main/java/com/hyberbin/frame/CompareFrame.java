@@ -23,6 +23,7 @@ import com.hyberbin.db.ConnectionUtil;
 import com.hyberbin.model.CodeTableListModel;
 import com.hyberbin.model.DataRowModel;
 import com.hyberbin.model.TableListModel;
+import com.hyberbin.util.IndexUtil;
 import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -137,6 +138,7 @@ public class CompareFrame extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jButton5 = new javax.swing.JButton();
         diff = new javax.swing.JLabel();
+        index = new javax.swing.JCheckBox();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTable2 = new javax.swing.JTable();
@@ -212,6 +214,8 @@ public class CompareFrame extends javax.swing.JFrame {
 
         diff.setText("0条不一样");
 
+        index.setText("自动添加索引");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -229,6 +233,8 @@ public class CompareFrame extends javax.swing.JFrame {
                         .addComponent(jCheckBox1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jCheckBox2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(index)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(diff)
                         .addGap(18, 18, 18)
@@ -263,7 +269,8 @@ public class CompareFrame extends javax.swing.JFrame {
                         .addComponent(diff))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jCheckBox1)
-                        .addComponent(jCheckBox2)))
+                        .addComponent(jCheckBox2)
+                        .addComponent(index)))
                 .addContainerGap())
         );
 
@@ -510,6 +517,9 @@ public class CompareFrame extends javax.swing.JFrame {
                     if (!ObjectHelper.isNullOrEmptyString(allChange)) {
                         diffCount++;
                     }
+                    if(index.isSelected()){
+                        allChange+=IndexUtil.getIndexAddString(table,  ConnectionUtil.getCompareConn());
+                    }
                     jProgressBar1.setValue(model.getFinished());
                     model.finishRow(table, columnMerge.getStatus(), allChange);
                     diff.setText(diffCount + "条不一样");
@@ -684,6 +694,7 @@ public class CompareFrame extends javax.swing.JFrame {
     private javax.swing.JTable datas;
     private javax.swing.JLabel diff;
     private javax.swing.JButton export;
+    private javax.swing.JCheckBox index;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;

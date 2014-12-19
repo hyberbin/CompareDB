@@ -69,6 +69,8 @@
                               <Component id="jCheckBox1" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="jCheckBox2" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="index" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="32767" attributes="0"/>
                               <Component id="diff" min="-2" max="-2" attributes="0"/>
                               <EmptySpace type="separate" max="-2" attributes="0"/>
@@ -110,6 +112,7 @@
                           <Group type="103" alignment="1" groupAlignment="3" attributes="0">
                               <Component id="jCheckBox1" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="jCheckBox2" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="index" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -201,6 +204,11 @@
             <Component class="javax.swing.JLabel" name="diff">
               <Properties>
                 <Property name="text" type="java.lang.String" value="0&#x6761;&#x4e0d;&#x4e00;&#x6837;"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JCheckBox" name="index">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="&#x81ea;&#x52a8;&#x6dfb;&#x52a0;&#x7d22;&#x5f15;"/>
               </Properties>
             </Component>
           </SubComponents>

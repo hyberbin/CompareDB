@@ -17,6 +17,7 @@
 package com.hyberbin.main;
 
 import com.hyberbin.frame.StartFrame;
+import org.jb2011.lnf.beautyeye.BeautyEyeLNFHelper;
 import org.jplus.hyb.database.config.ConfigCenter;
 import org.jplus.hyb.log.LocalLogger;
 import org.jplus.util.ObjectHelper;
@@ -26,7 +27,10 @@ import org.jplus.util.ObjectHelper;
  * @author Hyberbin
  */
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
+        //设置本属性将改变窗口边框样式定义
+        BeautyEyeLNFHelper.frameBorderStyle = BeautyEyeLNFHelper.FrameBorderStyle.osLookAndFeelDecorated;
+        org.jb2011.lnf.beautyeye.BeautyEyeLNFHelper.launchBeautyEyeLNF();
         if(ObjectHelper.isNotEmpty(args)){
             for(String arg:args){
                 arg=arg.toLowerCase();
