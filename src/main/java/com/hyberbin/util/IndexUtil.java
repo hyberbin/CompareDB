@@ -5,16 +5,19 @@
  */
 package com.hyberbin.util;
 
-import com.hyberbin.db.CompareUtil;
+import com.hyberbin.db.CompareMysql;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import com.hyberbin.db.ICompareDb;
 import org.jplus.hyb.database.transaction.IDbManager;
 import org.jplus.hyb.log.LoggerManager;
 import org.jplus.util.FileUtils;
+import org.jplus.util.NumberUtils;
 import org.jplus.util.ObjectHelper;
 
 /**
@@ -25,9 +28,14 @@ public class IndexUtil {
 
     private final static org.jplus.hyb.log.Logger log = LoggerManager.getLogger(IndexUtil.class);
     public static Set<String> indexNames = new HashSet();
-
     static {
         init();
+    }
+
+    private final ICompareDb compareDb;
+
+    public IndexUtil(ICompareDb compareDb){
+        this.compareDb=compareDb;
     }
 
     private static void init() {
@@ -52,14 +60,14 @@ public class IndexUtil {
         }
     }
 
-    public static String getIndexAddString(String table, IDbManager manager) {
-        List<Map> showDescribe = CompareUtil.showDescribe(table, manager);
+    public String getIndexAddString(String table, IDbManager manager) {
+        List<Map> showDescribe = compareDb.showDescribe(table, manager);
         StringBuilder sql = new StringBuilder();
         if (ObjectHelper.isNotEmpty(showDescribe)) {
             for (Map describe : showDescribe) {
-                String column = describe.get("column_name").toString().trim();
+                String column = describe.get("column_name").toString().trim().toLowerCase();
                 String DATA_TYPE = describe.get("DATA_TYPE").toString().trim().toLowerCase();
-                if (describe.containsKey("column_key") && indexNames.contains(column.toLowerCase()) && (DATA_TYPE.contains("int") || DATA_TYPE.contains("char"))) {
+                if (describe.containsKey("column_key") && (indexNames.contains(column)||column.endsWith("id")) && (DATA_TYPE.contains("int") || (DATA_TYPE.contains("char")&&NumberUtils.parseInt(describe.get("character_maximum_length"))<=32))) {
                     Object key = describe.get("column_key");
                     if (ObjectHelper.isNullOrEmptyString(key)) {
                         sql.append("ALTER TABLE `").append(table).append("` ADD INDEX `").append(column).append("` ( `").append(column).append("` ) ;\n");

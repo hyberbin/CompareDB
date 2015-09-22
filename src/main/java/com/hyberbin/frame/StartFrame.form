@@ -35,12 +35,12 @@
                       <EmptySpace min="31" pref="31" max="-2" attributes="0"/>
                       <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="bzk_lable" min="-2" pref="70" max="-2" attributes="0"/>
+                      <Component id="bzk_lable" min="-2" pref="103" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="bzk_url" max="32767" attributes="0"/>
+                      <Component id="bzk_url" min="-2" pref="254" max="-2" attributes="0"/>
                   </Group>
               </Group>
-              <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
           </Group>
           <Group type="102" attributes="0">
               <EmptySpace min="31" pref="31" max="-2" attributes="0"/>
@@ -78,7 +78,7 @@
                   <Group type="102" attributes="0">
                       <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="bjk_lable" min="-2" pref="67" max="-2" attributes="0"/>
+                      <Component id="bjk_lable" min="-2" pref="102" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="bjk_url" max="32767" attributes="0"/>
                       <EmptySpace min="10" pref="10" max="-2" attributes="0"/>

@@ -17,6 +17,8 @@
 package com.hyberbin.db;
 
 import com.hyberbin.bean.DbLinkBean;
+import com.hyberbin.compare.IColumnMerge;
+import com.hyberbin.compare.MysqlColumnMerge;
 import com.hyberbin.util.CmdUtil;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -34,15 +36,14 @@ import org.jplus.util.ObjectHelper;
  *
  * @author Hyberbin
  */
-public class CompareUtil {
+public class CompareMysql implements ICompareDb {
 
-    private final static Logger log = LoggerManager.getLogger(CompareUtil.class);
+    private final static Logger log = LoggerManager.getLogger(CompareMysql.class);
     private final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyyMMddHHmmss");
 
-    private CompareUtil() {
-    }
 
-    public static List<Map> showTables(String table, IDbManager manager) {
+    @Override
+    public List<Map> showTables(String table, IDbManager manager) {
         Hyberbin hyberbin = new Hyberbin(manager);
         String sql = "select TABLE_NAME,TABLE_COMMENT from INFORMATION_SCHEMA.TABLES where TABLE_SCHEMA=database() and TABLE_TYPE <> 'VIEW' ";
         if (!ObjectHelper.isNullOrEmptyString(table)) {
@@ -56,7 +57,8 @@ public class CompareUtil {
         return null;
     }
 
-    public static String showOneCreate(String tableName, IDbManager manager) {
+    @Override
+    public String showOneCreate(String tableName, IDbManager manager) {
         Hyberbin soEasy = new Hyberbin(manager);
         List<Map> mapList;
         try {
@@ -74,18 +76,19 @@ public class CompareUtil {
      * @param manager
      * @return
      */
-    public static List<Map> showDescribe(String tableName, IDbManager manager) {
+    @Override
+    public List<Map> showDescribe(String tableName, IDbManager manager) {
         Hyberbin hyberbin = new Hyberbin(manager);
         try {
-            return hyberbin.getMapList("select COLUMN_NAME,COLUMN_KEY,DATA_TYPE from information_schema.`COLUMNS` WHERE \n"
-                    + "TABLE_SCHEMA=database() and TABLE_NAME='" + tableName + "' ");
+            return hyberbin.getMapList("select COLUMN_NAME,COLUMN_KEY,DATA_TYPE,CHARACTER_MAXIMUM_LENGTH from information_schema.`COLUMNS` WHERE  TABLE_SCHEMA=database() and TABLE_NAME='" + tableName + "' ");
         } catch (SQLException ex) {
             log.error("showDescribe table:{} error!", tableName, ex);
         }
         return null;
     }
 
-    public static String getDbName(IDbManager manager) {
+    @Override
+    public String getDbName(IDbManager manager) {
         DatabaseAccess access = new DatabaseAccess(manager);
         try {
             Object queryUnique = access.queryUnique("select database()");
@@ -95,21 +98,46 @@ public class CompareUtil {
         }
         return null;
     }
+    
+    @Override
+    public List<Map> getTableStructs(IDbManager manager, String tableName){
+        try {
+            List<Map> mapList = new Hyberbin(manager).getMapList("select \n"
+                    + "cast(ifnull(character_maximum_length,\n"
+                    + "case when numeric_scale is null or numeric_scale=0 then numeric_precision else concat(numeric_precision,',',numeric_scale) end\n"
+                    + "\n"
+                    + ") as char)\n"
+                    + "as length , column_name as `column`, column_comment as `comment`,data_type from information_schema.columns  where table_schema=database() and table_name='" 
+                    + tableName + "'");
+            return mapList;
+        } catch (Exception ex) {
+            log.error("getTableStructs error!", ex);
+        }
+        return null;
+    }
 
-    public static String mysqldumpDb(String database, DbLinkBean dbLinkBean) {
+    @Override
+    public String exportDb(String database, DbLinkBean dbLinkBean) {
         Date now = new Date();
         String filename = database + FORMAT.format(now) + ".sql";
-        CmdUtil cmd = new CmdUtil("mysqldump", new String[]{"-u" + dbLinkBean.getUser() + " -p" + dbLinkBean.getPassword() + " -h" + dbLinkBean.getHost() + " -P" + dbLinkBean.getPort() + " -R  --skip-lock-tables --extended-insert=true --default-character-set=utf8 " + database + " --result-file=" + filename});
+        CmdUtil cmd = new CmdUtil("./mysqldump", new String[]{"-u" + dbLinkBean.getUser() + " -p" + dbLinkBean.getPassword() + " -h" + dbLinkBean.getHost() + " -P" + dbLinkBean.getPort() + " -R  --skip-lock-tables --extended-insert=true --default-character-set=utf8 " + database + " --result-file=" + filename});
         return cmd.getErrors();
     }
 
-    public static String mysqldump(String tables, String database, DbLinkBean dbLinkBean) {
-        CmdUtil cmd = new CmdUtil("mysqldump", new String[]{"-u" + dbLinkBean.getUser() + " -p" + dbLinkBean.getPassword() + " -h" + dbLinkBean.getHost() + " -P" + dbLinkBean.getPort() + " -R  --skip-lock-tables --extended-insert=true --default-character-set=utf8 " + database + " " + tables + " --result-file=dump.sql"});
+    @Override
+    public String export(String tables, String database, DbLinkBean dbLinkBean) {
+        CmdUtil cmd = new CmdUtil("./mysqldump", new String[]{"-u" + dbLinkBean.getUser() + " -p" + dbLinkBean.getPassword() + " -h" + dbLinkBean.getHost() + " -P" + dbLinkBean.getPort() + " -R  --skip-lock-tables --extended-insert=true --default-character-set=utf8 " + database + " " + tables + " --result-file=dump.sql"});
         return cmd.getErrors();
     }
 
-    public static String mysql(String dbFileName, String database, DbLinkBean dbLinkBean) {
-        CmdUtil cmd = new CmdUtil("mysql", new String[]{"--default-character-set=utf8 -u" + dbLinkBean.getUser() + " -p" + dbLinkBean.getPassword() + " -h" + dbLinkBean.getHost() + " -P" + dbLinkBean.getPort(), "use " + database, "source " + dbFileName});
+    @Override
+    public String importDb(String dbFileName, String database, DbLinkBean dbLinkBean) {
+        CmdUtil cmd = new CmdUtil("./mysql", new String[]{"--default-character-set=utf8 -u" + dbLinkBean.getUser() + " -p" + dbLinkBean.getPassword() + " -h" + dbLinkBean.getHost() + " -P" + dbLinkBean.getPort(), "use " + database, "source " + dbFileName});
         return cmd.getErrors();
+    }
+
+    @Override
+    public IColumnMerge getColumnMerge(String table, String createTableSql) {
+        return new MysqlColumnMerge(table, createTableSql);
     }
 }

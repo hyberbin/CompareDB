@@ -45,7 +45,7 @@ public class Main {
                 }
             }
         }
-        ConfigCenter.INSTANCE.getSqlout().setSqlout(false);
+        ConfigCenter.INSTANCE.getSqlout().setSqlout(true);
         new StartFrame().setVisible(true);
     }
 }

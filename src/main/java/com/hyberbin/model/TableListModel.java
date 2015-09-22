@@ -88,6 +88,17 @@ public final class TableListModel extends DefaultTableModel {
         }
         return list;
     }
+    
+    public List<String> getSelectedTablesComments() {
+        List<String> list = new ArrayList<String>(0);
+        for (int i = 0; i < this.getRowCount(); i++) {
+            boolean b = (Boolean) getValueAt(i, 0);
+            if (b) {
+                list.add(this.getValueAt(i, 2).toString());
+            }
+        }
+        return list;
+    }
 
     /**
      * 反选所有表
@@ -172,7 +183,9 @@ public final class TableListModel extends DefaultTableModel {
             public void run() {
                 if (ObjectHelper.isNotEmpty(tableList)) {
                     for (Map map : tableList) {
-                        addTable(map.get("TABLE_NAME").toString(),map.get("TABLE_COMMENT").toString());
+                        Object table_name = map.get("TABLE_NAME");
+                        Object table_comment = map.get("TABLE_COMMENT");
+                        addTable(table_name.toString(), table_comment==null?"":table_comment.toString());
                     }
                 }
             }

@@ -17,6 +17,9 @@
 package com.hyberbin.frame;
 
 import com.hyberbin.bean.DbLinkBean;
+import com.hyberbin.db.CompareMysql;
+import com.hyberbin.db.CompareOracle;
+import com.hyberbin.db.ICompareDb;
 import com.hyberbin.model.LalelListModel;
 import java.awt.Toolkit;
 import java.awt.event.ItemEvent;
@@ -145,10 +148,10 @@ public class StartFrame extends javax.swing.JFrame {
                         .addGap(31, 31, 31)
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(bzk_lable, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(bzk_lable, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(bzk_url)))
-                .addGap(10, 10, 10))
+                        .addComponent(bzk_url, javax.swing.GroupLayout.PREFERRED_SIZE, 254, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(layout.createSequentialGroup()
                 .addGap(31, 31, 31)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -178,7 +181,7 @@ public class StartFrame extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel5)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(bjk_lable, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(bjk_lable, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(bjk_url)
                         .addGap(10, 10, 10))))
@@ -229,8 +232,8 @@ public class StartFrame extends javax.swing.JFrame {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         bzk=new DbLinkBean("bzk", bzk_user.getText(), bzk_url.getText(), bzk_pass.getText());
         bjk=new DbLinkBean("bjk", bjk_user.getText(), bjk_url.getText(), bjk_pass.getText());
-        
-        new CompareFrame(this).iniAll("");
+        ICompareDb compareDb=bzk_url.getText().contains("mysql")?new CompareMysql():new CompareOracle();
+        new CompareFrame(this,compareDb).iniAll("");
         this.dispose();
     }//GEN-LAST:event_jButton2ActionPerformed
 

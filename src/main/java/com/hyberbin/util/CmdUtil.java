@@ -69,7 +69,7 @@ public class CmdUtil {
     }
 
     private Process exeWindows() throws Exception {
-        String cmd = "\"cmd\" /c " + "\"\"" + mainFile + "\" " + argsLine[0] + "\"";
+        String cmd = "\"cmd\" /c \"\"" + mainFile + "\" " + argsLine[0] + "\"";
         log.debug("in exeWindows,cmdline:{}", cmd);
         return Runtime.getRuntime().exec(cmd);
 

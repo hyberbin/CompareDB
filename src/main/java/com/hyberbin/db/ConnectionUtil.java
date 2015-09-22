@@ -30,14 +30,29 @@ public class ConnectionUtil {
 
 
     public static IDbManager getMainConn() {
-        IDbManager manager=new AutoManager("main");
-        SimpleConfigurator.addConfigurator(new DbConfig(StartFrame.bzk.getUrl(), StartFrame.bzk.getUser(), StartFrame.bzk.getPassword(),"main"));
-        return manager;
+        String url=StartFrame.bzk.getUrl();
+        String driver=null;
+        if(url.contains("mysql")){
+            url+="&characterEncoding=UTF-8&generateSimpleParameterMetadata=true&useOldAliasMetadataBehavior=true&UseOldSyntax=true";
+            driver=DbConfig.DRIVER_MYSQL;
+        }else{
+            driver=DbConfig.DRIVER_ORACLE;
+        }
+        DbConfig main = new DbConfig(driver,url, StartFrame.bzk.getUser(), StartFrame.bzk.getPassword(), "main");
+        SimpleConfigurator.addConfigurator(main);
+        return new AutoManager("main");
     }
 
     public static IDbManager getCompareConn() {
-        IDbManager manager=new AutoManager("compare");
-        SimpleConfigurator.addConfigurator(new DbConfig(StartFrame.bjk.getUrl(), StartFrame.bjk.getUser(), StartFrame.bjk.getPassword(),"compare"));
-        return manager;
+        String url=StartFrame.bjk.getUrl();
+        String driver=null;
+        if(url.contains("mysql")){
+            url+="&characterEncoding=UTF-8&generateSimpleParameterMetadata=true&useOldAliasMetadataBehavior=true&UseOldSyntax=true";
+            driver=DbConfig.DRIVER_MYSQL;
+        }else{
+            driver=DbConfig.DRIVER_ORACLE;
+        }
+        SimpleConfigurator.addConfigurator(new DbConfig(driver,url, StartFrame.bjk.getUser(), StartFrame.bjk.getPassword(),"compare"));
+        return new AutoManager("compare");
     }
 }

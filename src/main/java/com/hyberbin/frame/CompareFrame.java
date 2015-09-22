@@ -16,10 +16,10 @@
  */
 package com.hyberbin.frame;
 
-import com.hyberbin.compare.ColumnMerge;
+import com.hyberbin.compare.MysqlColumnMerge;
 import com.hyberbin.compare.IColumnMerge;
-import com.hyberbin.db.CompareUtil;
 import com.hyberbin.db.ConnectionUtil;
+import com.hyberbin.db.ICompareDb;
 import com.hyberbin.model.CodeTableListModel;
 import com.hyberbin.model.DataRowModel;
 import com.hyberbin.model.TableListModel;
@@ -28,6 +28,7 @@ import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Enumeration;
@@ -38,6 +39,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.jplus.hyb.database.crud.DatabaseAccess;
 import org.jplus.hyb.database.crud.Hyberbin;
 import org.jplus.hyb.database.transaction.IDbManager;
@@ -54,11 +60,13 @@ import org.jplus.util.ObjectHelper;
 public class CompareFrame extends javax.swing.JFrame {
 
     private final static Logger log = LoggerManager.getLogger(CompareFrame.class);
+    private final ICompareDb compareUtil;
 
     /** Creates new form CompareFrame
      * @param startFrame */
-    public CompareFrame(final StartFrame startFrame) {
+    public CompareFrame(final StartFrame startFrame,ICompareDb compareUtil) {
         initComponents();
+        this.compareUtil=compareUtil;
         Toolkit tk = Toolkit.getDefaultToolkit();
         setLocation((tk.getScreenSize().width - getSize().width) / 2,
                 (tk.getScreenSize().height - getSize().height) / 2);
@@ -100,7 +108,7 @@ public class CompareFrame extends javax.swing.JFrame {
 
     public void iniAll(String table) {
         IDbManager mainConn = ConnectionUtil.getMainConn();
-        List<Map> showTables = CompareUtil.showTables(table, mainConn);
+        List<Map> showTables = compareUtil.showTables(table, mainConn);
         TableListModel model = ((TableListModel) jTable1.getModel());
         CodeTableListModel codeTableListModel = ((CodeTableListModel) jTable2.getModel());
         model.clear();
@@ -139,6 +147,7 @@ public class CompareFrame extends javax.swing.JFrame {
         jButton5 = new javax.swing.JButton();
         diff = new javax.swing.JLabel();
         index = new javax.swing.JCheckBox();
+        jButton8 = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTable2 = new javax.swing.JTable();
@@ -184,7 +193,7 @@ public class CompareFrame extends javax.swing.JFrame {
             }
         });
 
-        jButton2.setText("开始比较");
+        jButton2.setText("比较");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
@@ -216,6 +225,13 @@ public class CompareFrame extends javax.swing.JFrame {
 
         index.setText("自动添加索引");
 
+        jButton8.setText("导出数据结构");
+        jButton8.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton8ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -235,7 +251,7 @@ public class CompareFrame extends javax.swing.JFrame {
                         .addComponent(jCheckBox2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(index)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(diff)
                         .addGap(18, 18, 18)
                         .addComponent(jButton2)
@@ -243,10 +259,11 @@ public class CompareFrame extends javax.swing.JFrame {
                         .addComponent(export)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton5)
-                        .addGap(12, 12, 12))
+                        .addGap(18, 18, 18)
+                        .addComponent(jButton8))
                     .addComponent(jProgressBar1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 581, Short.MAX_VALUE)
+            .addComponent(jScrollPane1)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -266,8 +283,9 @@ public class CompareFrame extends javax.swing.JFrame {
                         .addComponent(jButton2)
                         .addComponent(export)
                         .addComponent(jButton5)
-                        .addComponent(diff))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(diff)
+                        .addComponent(jButton8))
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jCheckBox1)
                         .addComponent(jCheckBox2)
                         .addComponent(index)))
@@ -319,7 +337,7 @@ public class CompareFrame extends javax.swing.JFrame {
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 581, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 631, Short.MAX_VALUE)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jCheckBox3)
@@ -405,7 +423,7 @@ public class CompareFrame extends javax.swing.JFrame {
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 581, Short.MAX_VALUE)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 631, Short.MAX_VALUE)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -505,20 +523,20 @@ public class CompareFrame extends javax.swing.JFrame {
             @Override
             public void run() {
                 int diffCount = 0;
-                for (int i = 0; i < model.getRowCount(); i++) {
+                for (int i = 0; i < model.getSelectedCount(); i++) {
                     final int j = i;
                     String table = selectedTables.get(j);
                     log.debug("start table:" + table);
-                    String mainCreate = CompareUtil.showOneCreate(table, ConnectionUtil.getMainConn());
-                    String compareCreate = CompareUtil.showOneCreate(table, ConnectionUtil.getCompareConn());
-                    IColumnMerge columnMerge = new ColumnMerge(table, mainCreate);
+                    String mainCreate = compareUtil.showOneCreate(table, ConnectionUtil.getMainConn());
+                    String compareCreate = compareUtil.showOneCreate(table, ConnectionUtil.getCompareConn());
+                    IColumnMerge columnMerge = compareUtil.getColumnMerge(table, mainCreate);
                     columnMerge.merge(compareCreate);
                     String allChange = columnMerge.getAllChange();
                     if (!ObjectHelper.isNullOrEmptyString(allChange)) {
                         diffCount++;
                     }
-                    if(index.isSelected()){
-                        allChange+=IndexUtil.getIndexAddString(table,  ConnectionUtil.getCompareConn());
+                    if (index.isSelected()) {
+                        allChange += new IndexUtil(compareUtil).getIndexAddString(table, ConnectionUtil.getCompareConn());
                     }
                     jProgressBar1.setValue(model.getFinished());
                     model.finishRow(table, columnMerge.getStatus(), allChange);
@@ -545,7 +563,7 @@ public class CompareFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jCheckBox2ItemStateChanged
 
     private void exportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportActionPerformed
-        StringBuilder sql_create = new StringBuilder("SET FOREIGN_KEY_CHECKS=0;\n");
+        StringBuilder sql_create = new StringBuilder();
         StringBuilder sql_update = new StringBuilder();
         final TableListModel model = ((TableListModel) jTable1.getModel());
         for (int i = 0; i < model.getRowCount(); i++) {
@@ -560,7 +578,7 @@ public class CompareFrame extends javax.swing.JFrame {
         }
         File sqlfile = new File("update.sql");
         try {
-            FileUtils.writeStringToFile(sqlfile, sql_create.append(sql_update).toString(), "utf-8");
+            FileUtils.writeStringToFile(sqlfile, sql_create.append(sql_update).toString().replace("COMMENT '(null)'", ""), "utf-8");
             JOptionPane.showMessageDialog(this, "已经导出到update.sql");
         } catch (IOException ex) {
             log.error("导出文件出错！", ex, "导出文件出错！文件：{}打开错误！", "update.sql");
@@ -571,30 +589,30 @@ public class CompareFrame extends javax.swing.JFrame {
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         IDbManager mainConn = ConnectionUtil.getCompareConn();
-        String dbName = CompareUtil.getDbName(mainConn);
-        String mysql = CompareUtil.mysql("dump.sql", dbName, StartFrame.bjk);
+        String dbName = compareUtil.getDbName(mainConn);
+        String mysql = compareUtil.importDb("dump.sql", dbName, StartFrame.bjk);
         JOptionPane.showMessageDialog(rootPane, "执行完毕,附加信息【" + mysql + "】");
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         CodeTableListModel codeTableListModel = ((CodeTableListModel) jTable2.getModel());
         IDbManager mainConn = ConnectionUtil.getMainConn();
-        String dbName = CompareUtil.getDbName(mainConn);
-        String mysqldump = CompareUtil.mysqldump(codeTableListModel.getSelectedCodeTables(), dbName, StartFrame.bzk);
+        String dbName = compareUtil.getDbName(mainConn);
+        String mysqldump = compareUtil.export(codeTableListModel.getSelectedCodeTables(), dbName, StartFrame.bzk);
         JOptionPane.showMessageDialog(rootPane, "备份完成,附加信息【" + mysqldump + "】");
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         IDbManager bjk = ConnectionUtil.getCompareConn();
-        String dbName = CompareUtil.getDbName(bjk);
-        String mysql = CompareUtil.mysql("update.sql", dbName, StartFrame.bjk);
+        String dbName = compareUtil.getDbName(bjk);
+        String mysql = compareUtil.importDb("update.sql", dbName, StartFrame.bjk);
         JOptionPane.showMessageDialog(rootPane, "执行完毕,附加信息【" + mysql + "】");
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
         IDbManager bjk = ConnectionUtil.getCompareConn();
-        String dbName = CompareUtil.getDbName(bjk);
-        String mysql = CompareUtil.mysqldumpDb(dbName, StartFrame.bjk);
+        String dbName = compareUtil.getDbName(bjk);
+        String mysql = compareUtil.exportDb(dbName, StartFrame.bjk);
         JOptionPane.showMessageDialog(rootPane, "执行完毕,附加信息【" + mysql + "】");
     }//GEN-LAST:event_jButton6ActionPerformed
     Pager pager = new Pager(100);
@@ -664,6 +682,76 @@ public class CompareFrame extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_allActionPerformed
+
+    private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
+        final TableListModel model = ((TableListModel) jTable1.getModel());
+        final List<String> selectedTables = model.getSelectedTables();
+        final List<String> selectedTablesComments = model.getSelectedTablesComments();
+        Workbook workbook = new HSSFWorkbook();
+        Sheet sheet = workbook.createSheet();
+        int row = 0;
+        for (int i = 0; i < selectedTables.size(); i++) {
+            Row title = sheet.createRow(row++);
+            Cell tableName = title.createCell(0);
+            tableName.setCellValue(selectedTables.get(i));
+            Cell comment = title.createCell(1);
+            comment.setCellValue(selectedTablesComments.get(i));
+            Row columnTitles = sheet.createRow(row++);
+            setTitle(columnTitles);
+            List<Map> tableStructs = compareUtil.getTableStructs(ConnectionUtil.getCompareConn(), selectedTables.get(i));
+            for (Map map : tableStructs) {
+                Row column = sheet.createRow(row++);
+                setRow(column, map);
+            }
+            sheet.createRow(row++);
+        }
+        File file = new File("导出.xls");
+        FileOutputStream fileOutputStream;
+        try {
+            fileOutputStream = new FileOutputStream(file);
+            workbook.write(fileOutputStream);
+            fileOutputStream.close();
+        } catch (Exception ex) {
+            log.error("导出数据结构出错!", ex);
+        }
+
+    }//GEN-LAST:event_jButton8ActionPerformed
+
+    private static void setRow(Row row, Map data) {
+        for (int i = 0; i < 4; i++) {
+            Cell createCell = row.createCell(i);
+            if (i == 0) {
+                createCell.setCellValue(data.get("column") + "");
+            }
+            if (i == 1) {
+                createCell.setCellValue(data.get("comment") + "");
+            }
+            if (i == 2) {
+                createCell.setCellValue(getDataType((data.get("data_type") + "").replace("null", "")));
+            }
+            if (i == 3) {
+                createCell.setCellValue((data.get("length") + "").replace("null", ""));
+            }
+        }
+    }
+    private static String getDataType(String dbType){
+        if("char".equalsIgnoreCase(dbType)){
+            return "C";
+        }else if("varchar".equalsIgnoreCase(dbType)){
+            return "C";
+        }else if("int".equalsIgnoreCase(dbType)){
+            return "N";
+        }else return dbType.toUpperCase();
+    }
+    private final static String[] titles = new String[]{"字段名", "字段说明", "字段类型", "长度"};
+
+    private static void setTitle(Row row) {
+        for (int i = 0; i < 4; i++) {
+            Cell createCell = row.createCell(i);
+            createCell.setCellValue(titles[i]);
+        }
+    }
+
     private void fitTableColumns(JTable myTable) {
         JTableHeader header = myTable.getTableHeader();
         int rowCount = myTable.getRowCount();
@@ -702,6 +790,7 @@ public class CompareFrame extends javax.swing.JFrame {
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
     private javax.swing.JButton jButton7;
+    private javax.swing.JButton jButton8;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JCheckBox jCheckBox2;
     private javax.swing.JCheckBox jCheckBox3;

@@ -39,9 +39,9 @@ public class SqliteDao {
     protected static Logger log = LoggerManager.getLogger(SqliteDao.class);
 
     private static IDbManager getManager() {
+        SimpleConfigurator.addConfigurator(new DbConfig("org.sqlite.JDBC", "jdbc:sqlite:./data.db", "", "","sqlite"));
         log.debug("getManager: jdbc:sqlite:data.db");
         IDbManager manager=new SimpleManager("sqlite");
-        SimpleConfigurator.addConfigurator(new DbConfig("org.sqlite.JDBC", "jdbc:sqlite:./data.db", "", "","sqlite"));
         return manager;
     }
 

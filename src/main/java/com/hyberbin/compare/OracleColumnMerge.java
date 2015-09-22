@@ -1,33 +1,17 @@
-/*
- * Copyright 2014 Hyberbin.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * Email:hyberbin@qq.com
- */
 package com.hyberbin.compare;
 
 import com.hyberbin.bean.ColumnBean;
+import org.jplus.util.ObjectHelper;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.jplus.util.ObjectHelper;
 
 /**
- *
- * @author Hyberbin
+ * Created by hyberbin on 15/9/17.
  */
-public class ColumnMerge implements IColumnMerge {
+public class OracleColumnMerge implements IColumnMerge {
 
     private final Map<String, String> columnMap = new HashMap<String, String>();
     private final List<String> updateList = new ArrayList(0);
@@ -38,11 +22,15 @@ public class ColumnMerge implements IColumnMerge {
     private final StringBuilder status = new StringBuilder();
     private boolean newTable = false;
 
-    public ColumnMerge(String table, String createTableSql) {
-        String[] sql = createTableSql.split("\n");
+    public OracleColumnMerge(String table, String createTableSql) {
+        createTableSql=getTableDdl(createTableSql);//去掉表空间的描述
+        String tempsql=createTableSql.substring(createTableSql.indexOf("(")+1).trim();
+        String[] sql = tempsql.split("\n");
         for (String clo : sql) {
-            if (clo.trim().startsWith("`")) {
-                columnMap.put(getCloName(clo), clo.substring(0, clo.length() - 1));
+            clo=clo.trim();
+            if (clo.startsWith("\"")) {
+                int last_quot=clo.endsWith(",")?clo.length()-1:clo.length();
+                columnMap.put(getCloName(clo), clo.substring(0, last_quot).trim());
             }
         }
         this.table = table;
@@ -55,7 +43,7 @@ public class ColumnMerge implements IColumnMerge {
         if (ObjectHelper.isNotEmpty(updateList)) {
             status.append(" 有修改字段 ");
             for (String sql : updateList) {
-                str.append("alter table ").append(table).append(" modify column ").append(sql).append(";\n");
+                str.append("alter table ").append(table).append(" modify ( ").append(sql).append(");\n");
             }
         }
         return str.toString();
@@ -80,7 +68,7 @@ public class ColumnMerge implements IColumnMerge {
         if (ObjectHelper.isNotEmpty(addList)) {
             status.append(" 有新增字段 ");
             for (String sql : addList) {
-                str.append("alter table ").append(table).append(" add column ").append(sql).append(";\n");
+                str.append("alter table ").append(table).append(" add ( ").append(sql).append(");\n");
             }
         }
         return str.toString();
@@ -88,8 +76,8 @@ public class ColumnMerge implements IColumnMerge {
 
     @Override
     public String getAllChange() {
-        if (newTable) {            
-            return (createTable+";\n").replaceFirst("CREATE TABLE", "CREATE TABLE if not exists");
+        if (newTable) {
+            return (createTable+";\n");//.replaceFirst("CREATE TABLE", "CREATE TABLE if not exists");
         }
         StringBuilder str = new StringBuilder();
         str.append(getAddList());
@@ -105,6 +93,7 @@ public class ColumnMerge implements IColumnMerge {
 
     @Override
     public void merge(String createTableSql) {
+        createTableSql=getTableDdl(createTableSql);
         if(createTableSql.equals(createTable)){
             status.append("一致");
             columnMap.clear();
@@ -133,11 +122,13 @@ public class ColumnMerge implements IColumnMerge {
     }
 
     private List<ColumnBean> getColumnBeans(String createTableSql) {
-        String[] sql = createTableSql.split("\n");
         List<ColumnBean> list = new ArrayList(0);
+        String tempsql=createTableSql.substring(createTableSql.indexOf("(")+1).trim();
+        String[] sql = tempsql.split("\n");
         for (String clo : sql) {
-            if (clo.trim().startsWith("`")) {
-                list.add(new ColumnBean(getCloName(clo), clo.substring(0, clo.length() - 1)));
+            clo=clo.trim();
+            if (clo.startsWith("\"")) {
+                list.add(new ColumnBean(getCloName(clo), clo.substring(0, clo.length() - 1).trim()));
             }
         }
         return list;
@@ -145,7 +136,24 @@ public class ColumnMerge implements IColumnMerge {
 
     private static String getCloName(String ddl) {
         ddl = ddl.trim();
-        return ddl.substring(1, ddl.indexOf("`", 1));
+        return ddl.substring(1, ddl.indexOf("\"", 1));
+    }
+
+    private static String getTableDdl(String ddl){
+        String[] split = ddl.split("\n");
+        StringBuilder builder=new StringBuilder();
+        for(String sql:split){
+            sql=sql.trim();
+            if(sql.contains("TABLESPACE")){//去掉表空间的描述
+                if(sql.endsWith(";")){
+                    sql=";";
+                }else {
+                    sql="";
+                }
+            }
+            builder.append(sql+"\n");
+        }
+        return builder.toString();
     }
 
 }

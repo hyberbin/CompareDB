@@ -38,7 +38,7 @@ public final class CodeTableListModel extends DefaultTableModel {
             + "gb_16835 gb_16835_1 gb_16835_2 gb_16835_3 gb_2260 gb_2260_1 gb_2260_2 gb_2260_3 gb_2261_1 gb_2261_2 gb_2261_3 gb_2261_4 gb_2659 gb_3304 gb_4658 gb_4761 gb_4762 gb_4881 "
             + "gb_6565 gb_6864 gb_8561 gb_8561_1 gb_8561_2 gb_8563_1 gb_8563_2 gb_8563_3 gb_8563_3_1 gb_8563_3_2 jy_cfmc jy_gatqw jy_gwzy jy_jb jy_bzyd jy_jdfs jy_jldj jy_jlfs jy_jszgzl jy_lgyy "
             + "jy_prqk jy_rkxd jy_rxfs jy_ssmzsyjxms jy_szdqjjsx jy_szdqjjsx jy_xsdqzt jy_xx jy_xxbb jy_xxjyjgjbz jy_zxxkc jy_zxxkcdj "
-            + "jy_zxxbzlb dc_kpmd dc_kqlx dc_xxzt dc_cdz dc_gn dc_mkztbm dc_ptyyz dc_rep_module dc_rep_parameter dc_rep_report dc_qxzyy01").split(" ")));
+            + "jy_zxxbzlb dc_kpmd dc_kqlx dc_xxzt dc_cdz dc_gn dc_mkztbm dc_ptyyz dc_rep_module dc_rep_parameter dc_rep_report dc_qxzyy01 dc_cm_yyts").split(" ")));
 
     /**
      * 默认情况下这个方法不用重新实现的，但是这样就会造成如果这个列式boolean的类型，就当做string来处理了
@@ -152,7 +152,9 @@ public final class CodeTableListModel extends DefaultTableModel {
             public void run() {
                 if (ObjectHelper.isNotEmpty(tableList)) {
                     for (Map map : tableList) {
-                        addTable(map.get("TABLE_NAME").toString(), map.get("TABLE_COMMENT").toString());
+                        Object table_name = map.get("TABLE_NAME");
+                        Object table_comment = map.get("TABLE_COMMENT");
+                        addTable(table_name.toString(), table_comment==null?"":table_comment.toString());
                     }
                 }
             }
