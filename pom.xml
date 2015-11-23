@@ -55,18 +55,6 @@
                             </outputDirectory>                            
                         </configuration>
                     </execution>
-                    <execution>
-                        <id>copy2</id>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>
-                                C:/Users/hyberbin/Desktop/ProjectBuilder/CompareDB/lib
-                            </outputDirectory>
-                        </configuration>
-                    </execution>                   
                 </executions>
             </plugin>
             
@@ -102,6 +90,16 @@
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
       <version>5.1.23</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.poi</groupId>
+      <artifactId>poi</artifactId>
+      <version>3.8</version>
+    </dependency>
+    <dependency>
+      <groupId>com.oracle</groupId>
+      <artifactId>ojdbc7</artifactId>
+      <version>12.1.0.1.0</version>
     </dependency>
   </dependencies>
 </project>

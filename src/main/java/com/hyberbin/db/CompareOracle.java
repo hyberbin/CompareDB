@@ -39,7 +39,7 @@ public class CompareOracle implements ICompareDb {
         Hyberbin soEasy = new Hyberbin(manager);
         List<Map> mapList;
         try {
-            mapList = soEasy.getMapList("select to_char(dbms_metadata.get_ddl('TABLE','"+tableName.toUpperCase()+"' ))as ddl from dual,user_tables where upper(table_name)='"+tableName.toUpperCase()+"'");
+            mapList = soEasy.getMapList("select to_char(dbms_metadata.get_ddl('TABLE','"+tableName.toUpperCase()+"' ))as ddl from dual,user_tables where upper(table_name) like '%"+tableName.toUpperCase()+"%'");
             return mapList.isEmpty() ? "" : mapList.get(0).get("ddl").toString();
         } catch (SQLException ex) {
             log.error("showOneCreate table:{} error!", tableName, ex);
@@ -60,7 +60,7 @@ public class CompareOracle implements ICompareDb {
                 "\"comments\".COMMENTS AS \"COMMENT\",\"columns\".DATA_TYPE AS \"DATA_TYPE\" " +
                 " from user_tab_columns \"columns\", " +
                 " user_col_comments \"comments\" " +
-                " where \"columns\".Table_Name= \"comments\".Table_Name AND \"columns\".COLUMN_NAME =\"comments\".COLUMN_NAME  and upper(\"columns\".table_name)='" + tableName + "' order by \"columns\".COLUMN_ID ";
+                " where \"columns\".Table_Name= \"comments\".Table_Name AND \"columns\".COLUMN_NAME =\"comments\".COLUMN_NAME  and upper(\"columns\".table_name) like '%" + tableName + "%' order by \"columns\".COLUMN_ID ";
         Hyberbin hyberbin = new Hyberbin(manager);
         try {
             return hyberbin.getMapList(sql);
@@ -89,7 +89,7 @@ public class CompareOracle implements ICompareDb {
                     "\"comments\".COMMENTS AS \"comment\",\"columns\".DATA_TYPE AS \"data_type\" " +
                     " from user_tab_columns \"columns\", " +
                     " user_col_comments \"comments\" " +
-                    " where \"columns\".Table_Name= \"comments\".Table_Name AND \"columns\".COLUMN_NAME =\"comments\".COLUMN_NAME  and upper(\"columns\".table_name)='" + tableName;
+                    " where \"columns\".Table_Name= \"comments\".Table_Name AND \"columns\".COLUMN_NAME =\"comments\".COLUMN_NAME  and upper(\"columns\".table_name) like '%" + tableName+"%'";
             List<Map> mapList = new Hyberbin(manager).getMapList(sql);
             return mapList;
         } catch (Exception ex) {
