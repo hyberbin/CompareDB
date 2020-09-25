@@ -36,6 +36,45 @@
                     </archive>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <version>2.5.2</version>
+                <executions>
+                    <execution>
+                        <id>install-beautyeye</id>
+                        <phase>clean</phase>
+                        <configuration>
+                            <file>${basedir}/dist/lib/beautyeye-1.0.jar</file>
+                            <repositoryLayout>default</repositoryLayout>
+                            <groupId>org.beautyeye</groupId>
+                            <artifactId>beautyeye</artifactId>
+                            <version>1.0</version>
+                            <packaging>jar</packaging>
+                            <generatePom>true</generatePom>
+                        </configuration>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>install-ojdbc7</id>
+                        <phase>clean</phase>
+                        <configuration>
+                            <file>${basedir}/dist/lib/beautyeye-1.0.jar</file>
+                            <repositoryLayout>default</repositoryLayout>
+                            <groupId>com.oracle</groupId>
+                            <artifactId>ojdbc7</artifactId>
+                            <version>12.1.0.1.0</version>
+                            <packaging>jar</packaging>
+                            <generatePom>true</generatePom>
+                        </configuration>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             
             <!-- ����������jar��  -->
             <plugin>
@@ -74,8 +113,6 @@
       <groupId>org.beautyeye</groupId>
       <artifactId>beautyeye</artifactId>
       <version>1.0</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/dist/lib/beautyeye-1.0.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>org.jplus</groupId>
@@ -96,8 +133,6 @@
       <groupId>com.oracle</groupId>
       <artifactId>ojdbc7</artifactId>
       <version>12.1.0.1.0</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/dist/lib/ojdbc7-12.1.0.1.0.jar</systemPath>
     </dependency>
   </dependencies>
 </project>

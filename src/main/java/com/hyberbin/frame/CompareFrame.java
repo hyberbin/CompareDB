@@ -31,14 +31,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JTable;
+import java.util.*;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
+
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -61,6 +59,7 @@ public class CompareFrame extends javax.swing.JFrame {
 
     private final static Logger log = LoggerManager.getLogger(CompareFrame.class);
     private final ICompareDb compareUtil;
+    private Properties dbConfig=new Properties();
 
     /** Creates new form CompareFrame
      * @param startFrame */
@@ -169,8 +168,24 @@ public class CompareFrame extends javax.swing.JFrame {
         next = new javax.swing.JButton();
         all = new javax.swing.JButton();
         total = new javax.swing.JLabel();
+        jPanel4 = new javax.swing.JPanel();
+        Rbjk1 = new javax.swing.JRadioButton();
+        Rbzk1 = new javax.swing.JRadioButton();
+        searchTableName = new javax.swing.JTextField();
+        jButton9 = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        tableList = new javax.swing.JList();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        columnTable = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        jTabbedPane1.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jTabbedPane1StateChanged(evt);
+            }
+        });
 
         export.setText("导出脚本");
         export.addActionListener(new java.awt.event.ActionListener() {
@@ -274,7 +289,7 @@ public class CompareFrame extends javax.swing.JFrame {
                     .addComponent(tableName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 371, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -337,7 +352,7 @@ public class CompareFrame extends javax.swing.JFrame {
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 631, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 780, Short.MAX_VALUE)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jCheckBox3)
@@ -354,7 +369,7 @@ public class CompareFrame extends javax.swing.JFrame {
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 368, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 452, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jCheckBox3)
@@ -388,7 +403,6 @@ public class CompareFrame extends javax.swing.JFrame {
         });
 
         Gtables.add(Rbjk);
-        Rbjk.setSelected(true);
         Rbjk.setText("比较库");
 
         Gtables.add(Rbzk);
@@ -423,7 +437,7 @@ public class CompareFrame extends javax.swing.JFrame {
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 631, Short.MAX_VALUE)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 780, Short.MAX_VALUE)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -464,12 +478,106 @@ public class CompareFrame extends javax.swing.JFrame {
                     .addComponent(sql, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton7))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 305, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 381, Short.MAX_VALUE)
                 .addGap(17, 17, 17)
                 .addComponent(total))
         );
 
         jTabbedPane1.addTab("SQL编辑器", jPanel3);
+
+        Gtables.add(Rbjk1);
+        Rbjk1.setText("比较库");
+
+        Gtables.add(Rbzk1);
+        Rbzk1.setSelected(true);
+        Rbzk1.setText("标准库");
+
+        jButton9.setText("查询");
+        jButton9.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton9ActionPerformed(evt);
+            }
+        });
+
+        jLabel3.setText("表名或备注");
+
+        tableList.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                tableListValueChanged(evt);
+            }
+        });
+        jScrollPane4.setViewportView(tableList);
+
+        columnTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "字段名", "数据类型", "备注", "外键"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, true, true
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        columnTable.setColumnSelectionAllowed(true);
+        jScrollPane5.setViewportView(columnTable);
+        columnTable.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        if (columnTable.getColumnModel().getColumnCount() > 0) {
+            columnTable.getColumnModel().getColumn(3).setResizable(false);
+            columnTable.getColumnModel().getColumn(3).setCellEditor(new com.hyberbin.model.ButtonEditor(CompareFrame.this));
+            columnTable.getColumnModel().getColumn(3).setCellRenderer(new com.hyberbin.model.ButtonRenderer());
+        }
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(Rbjk1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(Rbzk1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel3)
+                .addGap(8, 8, 8)
+                .addComponent(searchTableName)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton9)
+                .addGap(210, 210, 210))
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 247, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 525, Short.MAX_VALUE))
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(Rbjk1)
+                    .addComponent(Rbzk1)
+                    .addComponent(jButton9)
+                    .addComponent(searchTableName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel3))
+                .addGap(26, 26, 26)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane4)
+                    .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 420, Short.MAX_VALUE)))
+        );
+
+        jTabbedPane1.addTab("表结构查询", jPanel4);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -717,6 +825,66 @@ public class CompareFrame extends javax.swing.JFrame {
 
     }//GEN-LAST:event_jButton8ActionPerformed
 
+    private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
+        loadTableList();
+    }//GEN-LAST:event_jButton9ActionPerformed
+
+    private void jTabbedPane1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jTabbedPane1StateChanged
+        if (((JTabbedPane) evt.getSource()).getSelectedIndex() == 3) {
+            if(tableList.getModel().getSize()==0){
+                loadTableList();
+            }
+        }
+    }//GEN-LAST:event_jTabbedPane1StateChanged
+
+    private void tableListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_tableListValueChanged
+        String tableName = tableList.getSelectedValue();
+        if(tableName!=null){
+            tableName=tableName.substring(0,tableName.indexOf("("));
+            loadTableDesc(tableName);
+        }
+    }//GEN-LAST:event_tableListValueChanged
+
+    private void loadTableList() {
+        String dbName = compareUtil.getDbName(Rbzk1.isSelected() ? ConnectionUtil.getMainConn() : ConnectionUtil.getCompareConn());
+        loadDbConfig(dbName);
+        List<Map> showTables = compareUtil.showTables(searchTableName.getText(), Rbzk1.isSelected() ? ConnectionUtil.getMainConn() : ConnectionUtil.getCompareConn());
+        tableList.setListData(new String[]{});
+        List<String> tables=new ArrayList<String>();
+        if (showTables != null) {
+            for (Map map : showTables) {
+                tables.add(map.get("TABLE_NAME")+"("+map.get("TABLE_COMMENT")+")");
+            }
+            tableList.setListData(tables.toArray(new String[]{}));
+        }
+    }
+
+    private void loadDbConfig(String database){
+        dbConfig=new Properties();
+        try {
+            dbConfig.load(CompareFrame.class.getResourceAsStream("/dbconfig/"+database+".properties"));
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void loadTableDesc(String tableName){
+        List<Map> tableStructs = compareUtil.getTableStructs(Rbzk1.isSelected() ? ConnectionUtil.getMainConn() : ConnectionUtil.getCompareConn(), tableName);
+        DefaultTableModel model = (DefaultTableModel)columnTable.getModel();
+        while (model.getRowCount()>0){
+            model.removeRow(0);
+        }
+        if(tableStructs!=null){
+            for(Map<String,String> table:tableStructs){
+                String column=table.get("column");
+                String property="";
+                if(dbConfig.containsKey(column)){
+                     property = dbConfig.getProperty(column);
+                }
+                model.addRow(new String[]{column,table.get("data_type"),table.get("comment"),property});
+            }
+        }
+    }
     private static void setRow(Row row, Map data) {
         for (int i = 0; i < 4; i++) {
             Cell createCell = row.createCell(i);
@@ -775,10 +943,13 @@ public class CompareFrame extends javax.swing.JFrame {
     private javax.swing.ButtonGroup Gactions;
     private javax.swing.ButtonGroup Gtables;
     private javax.swing.JRadioButton Rbjk;
+    private javax.swing.JRadioButton Rbjk1;
     private javax.swing.JRadioButton Rbzk;
+    private javax.swing.JRadioButton Rbzk1;
     private javax.swing.JRadioButton Rexecute;
     private javax.swing.JRadioButton Rselect;
     private javax.swing.JButton all;
+    private javax.swing.JTable columnTable;
     private javax.swing.JTable datas;
     private javax.swing.JLabel diff;
     private javax.swing.JButton export;
@@ -791,24 +962,31 @@ public class CompareFrame extends javax.swing.JFrame {
     private javax.swing.JButton jButton6;
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
+    private javax.swing.JButton jButton9;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JCheckBox jCheckBox2;
     private javax.swing.JCheckBox jCheckBox3;
     private javax.swing.JCheckBox jCheckBox4;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTable jTable1;
     private javax.swing.JTable jTable2;
     private javax.swing.JButton next;
+    private javax.swing.JTextField searchTableName;
     private javax.swing.JTextField sql;
+    private javax.swing.JList<String> tableList;
     private javax.swing.JTextField tableName;
     private javax.swing.JLabel total;
     // End of variables declaration//GEN-END:variables

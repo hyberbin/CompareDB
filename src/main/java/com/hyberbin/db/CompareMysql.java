@@ -47,7 +47,7 @@ public class CompareMysql implements ICompareDb {
         Hyberbin hyberbin = new Hyberbin(manager);
         String sql = "select TABLE_NAME,TABLE_COMMENT from INFORMATION_SCHEMA.TABLES where TABLE_SCHEMA=database() and TABLE_TYPE <> 'VIEW' ";
         if (!ObjectHelper.isNullOrEmptyString(table)) {
-            sql += " and TABLE_NAME like '%" + table.trim() + "%'";
+            sql += " and (TABLE_NAME like '%" + table.trim() + "%' or TABLE_COMMENT like '%" + table.trim() + "%')";
         }
         try {
             return hyberbin.getMapList(sql);
