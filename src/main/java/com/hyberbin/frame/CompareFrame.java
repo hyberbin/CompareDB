@@ -28,8 +28,10 @@ import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.sql.SQLException;
 import java.util.*;
 import javax.swing.*;
@@ -862,7 +864,8 @@ public class CompareFrame extends javax.swing.JFrame {
     private void loadDbConfig(String database){
         dbConfig=new Properties();
         try {
-            dbConfig.load(CompareFrame.class.getResourceAsStream("/dbconfig/"+database+".properties"));
+            FileInputStream inputStream=new FileInputStream("./dbconfig/" + database + ".properties");
+            dbConfig.load(inputStream);
         } catch (Throwable e) {
             e.printStackTrace();
         }
