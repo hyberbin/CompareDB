@@ -68,7 +68,7 @@ public class MysqlColumnMerge implements IColumnMerge {
         if (ObjectHelper.isNotEmpty(dropList)) {
             status.append(" 有删除字段 ");
             for (String sql : dropList) {
-                str.append("alter table ").append(table).append(" drop column ").append(sql).append(";\n");
+                str.append("# alter table ").append(table).append(" drop column ").append(sql).append(";\n");
             }
         }
         return str.toString();
@@ -94,7 +94,7 @@ public class MysqlColumnMerge implements IColumnMerge {
         }
         StringBuilder str = new StringBuilder();
         str.append(getAddList());
-        //str.append(getDropList());
+        str.append(getDropList());
         str.append(getUpdateList());
         return str.toString();
     }
@@ -125,7 +125,7 @@ public class MysqlColumnMerge implements IColumnMerge {
     private void addColumn(ColumnBean column) {
         String columnStr = columnMap.get(column.getName());
         if (columnStr == null) {//标准SQL中没有这个字段，移除
-            dropList.add(columnStr);
+            dropList.add(column.getName()+"; # "+column.getSql());
         } else if (columnStr.equals(column.getSql())) {//两个字段一模一样
         } else {//不一样那么更新这个字段
             updateList.add(columnStr);

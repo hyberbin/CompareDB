@@ -675,20 +675,23 @@ public class CompareFrame extends javax.swing.JFrame {
     private void exportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportActionPerformed
         StringBuilder sql_create = new StringBuilder();
         StringBuilder sql_update = new StringBuilder();
+        StringBuilder sql_drop = new StringBuilder();
         final TableListModel model = ((TableListModel) jTable1.getModel());
         for (int i = 0; i < model.getRowCount(); i++) {
             String table = model.getValueAt(i, 5).toString();
             if (!ObjectHelper.isNullOrEmptyString(table)) {
                 if (table.startsWith("CREATE")) {
                     sql_create.append(table);
-                } else {
+                } else if (table.startsWith("alter")){
                     sql_update.append(table);
+                } else {
+                    sql_drop.append(table);
                 }
             }
         }
         File sqlfile = new File("update.sql");
         try {
-            FileUtils.writeStringToFile(sqlfile, sql_create.append(sql_update).toString().replace("COMMENT '(null)'", ""), "utf-8");
+            FileUtils.writeStringToFile(sqlfile, sql_create.append(sql_update).append(sql_drop).toString().replace("COMMENT '(null)'", ""), "utf-8");
             JOptionPane.showMessageDialog(this, "已经导出到update.sql");
         } catch (IOException ex) {
             log.error("导出文件出错！", ex, "导出文件出错！文件：{}打开错误！", "update.sql");
